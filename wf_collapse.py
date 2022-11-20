@@ -35,37 +35,36 @@ with open("./example.txt", "r") as ff:
 
     for line_id, line in enumerate(content):
         for c_id, c in enumerate(line):
-            # print("--> {}:{} | Actual char: {}".format(line_id, c_id, line[c_id]))
 
             if c not in ocurrances.keys():
                 ocurrances[c] = 1
             else:
-                ocurrances[c] = ocurrances[c]+1;
+                ocurrances[c] = ocurrances[c] + 1;
 
+            check_idx = [line_id - 1, c_id - 1, line_id + 1, c_id + 1]
+            check_if = []
+
+            rules = []
             # Check uppper side
             if line_id - 1 >= 0:
-                # print("Up: {}".format(content[line_id - 1][c_id]))
                 rule = [c, content[line_id - 1][c_id], 0]
-                if rule not in rulebook:
-                    rulebook.append(rule)
+                rules.append(rule)
             # Check left hand side
             if c_id - 1 >= 0:
-                # print("Left: {}".format(line[c_id - 1]))
                 rule = [c, line[c_id - 1], 1]
-                if rule not in rulebook:
-                    rulebook.append(rule)
+                rules.append(rule)
             # Check down side
             if line_id + 1 < length:
                 rule = [c, content[line_id + 1][c_id], 2]
-                if rule not in rulebook:
-                    rulebook.append(rule)
-                # print("Down: {}".format(content[line_id + 1][c_id]))
+                rules.append(rule)
             # Check right hand side
             if c_id + 1 < width:
-                # print("Right: {}".format(line[c_id + 1]))
                 rule = [c, line[c_id + 1], 3]
-                if rule not in rulebook:
-                    rulebook.append(rule)
+                rules.append(rule)
+
+            for r in rules:
+                if r not in rulebook:
+                    rulebook.append(r)
 
     rulebook = np.array(rulebook)
     options = np.unique(rulebook[:, 0])
@@ -86,7 +85,6 @@ def select_random_weighted(options):
             break
     print("Correct: {}".format(correct))
 
-    # return ranges[correct]
     return options[correct]
 
 def select(options):
@@ -105,18 +103,13 @@ def filtered_options(now, direction):
     
     return specific_rules
 
-# THIS IS THE PROBLEM
 def differential_matrix(m_base, m_extract):
     resm = []
     for i in m_base:
         if i in m_extract:
             resm.append(i)
-    # if len(resm) == 0:
-        # return m_base
     return resm
 
-
-print(rulebook)
 
 
 init = False
@@ -127,6 +120,11 @@ while completed == False:
 
     if init == False:
         # Since you already know that all cells have N basic choices, you don't really need a matrix, you can just collapse with the basis vector if there's no rules yet
+        print("+" * 10)
+        print("Initial Run")
+        print(rulebook)
+        print("+" * 10)
+
         res_matrix = [{"collapsed": False, "options": options} for i in range(length * width)]
         i = 0
         init = True
